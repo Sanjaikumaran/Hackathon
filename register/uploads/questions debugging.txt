@@ -1,0 +1,31 @@
+1. Time, conditionals, from..import, for..else?
+from time import localtime\nactivities = {8: \'Sleeping\',\n              9: \'Commuting\',\n              17: \'Working\',\n              18: \'Commuting\',\n       20: \'Eating\',\n              22: \'Resting\' }\ntime_now = localtime()\nhour = time_now.tm_hour\nfor activity_time in sorted(activities.keys()):\n    if hour < activity_time:\nprint (activities[activity_time])\nbreak\nelse:\nprint (\'Unknown, AFK or sleeping!\')
+
+2.Triple-quoted strings, while loop?
+REFRAIN = \'''\n%d bottles of beer on the wall,\n%d bottles of beer,\ntake one down, pass it around,\n%d bottles of beer on the wall!
+\'''\nbottles_of_beer = 9\nwhile bottles_of_beer > 1:\n    print (REFRAIN % (bottles_of_beer, bottles_of_beer,\n        bottles_of_beer - 1))\n    bottles_of_beer -= 1
+
+3.Classes?
+class BankAccount(object):\n    def __init__(self, initial_balance=0):\n        self.balance = initial_balance\n    def deposit(self, amount):\n        self.balance += amount\n    def withdraw(self, amount):\n        self.balance -= amount\n    def overdrawn(self):\n        return self.balance \nmy_account = BankAccount(15)\nmy_account.withdraw(50)\nprint (my_account.balance, my_account.overdrawn())
+
+4. Unit testing with unittest?
+import unittest\ndef median(pool):\n    copy = sorted(pool)\n    size = len(copy)\n    if size % 2 == 1:\n        return copy[int((size - 1) / 2)]\n    else:\n        return (copy[int(size/2 - 1)] + copy[int(size/2)]) / 2\nclass TestMedian(unittest.TestCase):\n    def testMedian(self):\n        self.assertEqual(median([2, 9, 9, 7, 9, 2, 4, 5, 8]), 7)\nif __name__ ==\ '__main__\':\n    unittest.main()
+
+5.Doctest-based testing?
+def median(pool):\n    \'''Statistical median to demonstrate doctest.\n    >>> median([2, 9, 9, 7, 9, 2, 4, 5, 8])\n    6 #change to 7 in order to pass the test\n    \'''\n    copy = sorted(pool)\n    size = len(copy)\n    if size % 2 == 1 :      \n            return copy[int((size - 1) / 2)]\n    else:\n        return (copy[int(size/2 - 1)] + copy[int(size/2)]) / 2\nif __name__ ==\ '__main__\':\n    import doctest\n    doctest.testmod()
+
+6.itertools?
+from itertools import groupby\nlines =\ '''\nThis is the\nfirst paragraph.\nThis is the second.
+\'''.splitlines()\n# Use itertools.groupby and bool to return groups of\n# consecutive lines that either have content or don't.\nfor has_chars, frags in groupby(lines, bool):\n    if has_chars:\n        print (\' \'.join(frags))\n# PRINTS:\n# This is the first paragraph.\n# This is the second.
+
+7.csv module, tuple unpacking, cmp() built-in?
+import csv\n# need to define cmp function in Python 3\ndef cmp(a, b):\n    return (a > b) - (a < b)\n# write stocks data as comma-separated values\nwith open(\'stocks.csv\', \'w\', newline=\'') as stocksFileW:\n    writer = csv.writer(stocksFileW)\n    writer.writerows([\n        [\'GOOG\', \'Google, Inc.\', 505.24, 0.47, 0.09],\n        [\'YHOO\', \'Yahoo! Inc.\', 27.38, 0.33, 1.22],\n        [\'CNET\', \'CNET Networks, Inc.\', 8.62, -0.13, -1.4901]])\n# read stocks data, print status messages\nwith open(\'stocks.csv\', \'r\') as stocksFile:\n    stocks = csv.reader(stocksFile)\n    status_labels = {-1: \'down\', 0: \'unchanged\', 1: \'up\'}\n    for ticker, name, price, change, pct in stocks:\n        status = status_labels[cmp(float(change), 0.0)]\n        print (\'%s is %s (%.2f)\' % (name, status, float(pct)))
+
+8.8-Queens Problem (recursion)?
+BOARD_SIZE = 8\ndef under_attack(col, queens):\n    left = right = col\n    for r, c in reversed(queens):\n        left, right = left - 1, right + 1\n        if c in (left, col, right):\n            return True\n    return False\ndef solve(n):\n    if n == 0:\n        return [[]]\n    smaller_solutions = solve(n - 1)\n    return [solution+[(n,i+1)]\n        for i in range(BOARD_SIZE)\n            for solution in smaller_solutions\n                if not under_attack(i+1, solution)]\nfor answer in solve(BOARD_SIZE):\n   print (answer)
+
+9.Prime numbers sieve w/fancy generators?
+import itertools\ndef iter_primes():\n     # an iterator of all numbers between 2 and +infinity\n     numbers = itertools.count(2)\n     # generate primes forever\n     while True:\n         # get the first number from the iterator (always a prime)\n         prime = next(numbers)\n         yield prime\n         # this code iteratively builds up a chain of\n         # filters...slightly tricky, but ponder it a bit\n         numbers = filter(prime.__rmod__, numbers)\nfor p in iter_primes():\n    if p > 1000:\n        break\n    print (p)
+
+10.8-Queens Problem (define your own exceptions)?
+BOARD_SIZE = 8\nclass BailOut(Exception):\n    pass\ndef validate(queens):\n    left = right = col = queens[-1]\n    for r in reversed(queens[:-1]):\n        left, right = left-1, right+1\n        if r in (left, col, right):\n            raise BailOut\ndef add_queen(queens):\n    for i in range(BOARD_SIZE):\n        test_queens = queens + [i]\n        try:\n            validate(test_queens)\n            if len(test_queens) == BOARD_SIZE:\n                return test_queens\n            else:\n                return add_queen(test_queens)\n        except BailOut:\n            pass\n    raise BailOut\nqueens = add_queen([])\nprint (queens)\nprint (\"\n\".join(\". \"*q + \"Q \" + \". \"*(BOARD_SIZE-q-1) for q in queens))
