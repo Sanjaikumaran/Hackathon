@@ -1,3 +1,6 @@
+# Website for hackathon event 
+
+used template
 # Play - Free Tailwind CSS Template for Startup, Apps and SaaS
 
 Play is an open-source and free Tailwind CSS template co-created by TailGrids and UIdeck. This template specially crafted for SaaS, startup, business and software website.
